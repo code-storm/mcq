@@ -1,8 +1,14 @@
-<app-header></app-header>
-<div class="row">
+<app-header (finish)="finishTest()"></app-header>
+<div class="row reset">
     <ul>
-        <li *ngFor="let question of questions">
-            {{ question }}
+        <li *ngFor="let each of questions; let qi = index">
+            {{ each.quest }}
+            <div *ngFor="let enum of each.opts">
+                <label for="{{qi}}_enum_answer_{{enum}}">
+                    <input id="{{qi}}_enum_answer_{{enum}}" [value]='enum' type="radio" name="{{qi}}_enums" [(ngModel)]="each.ans"> {{enum}}
+                </label>
+            </div>
         </li>
     </ul>
 </div>
+<ng-template #popupContainer></ng-template>

@@ -19,7 +19,8 @@
       </li>
     </ul>
     <form class="form-inline mt-2 mt-md-0">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="button">FINISH</button>
+      <span id="timer" style="margin-right: 15px;color: white;">00:00</span>
+      <button class="btn btn-outline-success my-2 my-sm-0" (click)="onFinish($event)" type="button">FINISH</button>
     </form>
   </div>
 </nav>
