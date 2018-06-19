@@ -90,7 +90,8 @@ export class OnlineTestComponent implements OnInit {
       // If the count down is finished, write some text 
       if (diff < 0) {
         clearInterval(this.interval);
-        document.getElementById("demo").innerHTML = "--:--";
+        document.getElementById("timer").innerHTML = "--:--";
+        this.finishTest();
         console.info('Ending test');
       }
     })

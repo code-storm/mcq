@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 import { DataService } from './data.service';
 
 declare var FB: any;
 @Injectable()
 export class IsuserconnectedGuard implements CanActivate {
-  constructor(private dataService: DataService) { }
+  constructor(private dataService: DataService,
+    private router: Router) { }
 
   canActivate(
     next: ActivatedRouteSnapshot,
@@ -15,51 +17,15 @@ export class IsuserconnectedGuard implements CanActivate {
     return this.checkFbUser()
   }
 
-  checkFbUser(): Observable<boolean> {
-    return this.dataService.getFacebookUserDetails.map(response => {
+  private checkFbUser(): Observable<boolean> {
+    let k = this.dataService.getFacebookUserDetails.switchMap(response => {
       if (response) {
-        return true;
+        return Observable.of(true);
       } else {
-        return false;
+        this.router.navigateByUrl('login');
+        return Observable.of(false);
       }
     });
-    // return this.getLoginStatus();
-    // (<any>window).fbAsyncInit = () => {
-    //   FB.init({
-    //     appId: '240875379640481',
-    //     cookie: true,
-    //     xfbml: true,
-    //     version: 'v3.0'
-    //   });
-
-    //   FB.AppEvents.logPageView();
-
-    // };
-
-    // (function (d, s, id) {
-    //   var js, fjs = d.getElementsByTagName(s)[0];
-    //   if (d.getElementById(id)) { return; }
-    //   js = d.createElement(s); js.id = id;
-    //   js.src = "https://connect.facebook.net/en_US/sdk.js";
-    //   fjs.parentNode.insertBefore(js, fjs);
-    // }(document, 'script', 'facebook-jssdk'));
-
-
-  }
-
-  getLoginStatus(): Observable<boolean> {
-    if (typeof FB !== "undefined") {
-
-      return FB.getLoginStatus((response) => {
-        if (response.status === "authorization_expired") {
-          return false;
-        } else if (response.status === 'connected') {
-          return true;
-        }
-        console.log('Guard', response);
-      });
-    } else {
-      return Observable.of(false);
-    }
+    return k;
   }
 }

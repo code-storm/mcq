@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DataService } from '../data.service';
+import { constant } from '../app.constant';
+import { Subscription } from 'rxjs';
 
 declare var google: any;
 @Component({
@@ -10,16 +12,28 @@ declare var google: any;
 export class ReportComponent implements OnInit {
 
   constructor(private dataService: DataService) { }
-
+  correctAnswers: [string, number][] = [];
+  subscription: Subscription[] = [];
   ngOnInit() {
-    this.dataService.getQuestionanswers.flatMap(responseData => {
-      return responseData
-    }).subscribe(response => {
-      this.googleChartInit();
+    const sub = this.dataService.getQuestionanswers.subscribe(response => {
+      console.log('efef', response);
+      ['Magnetism', 'Electricity', 'Physics'].forEach(value => {
+        const filteredData = response.filter((r, i) => r.ans && r.section === value && r.ans === constant.ANSWERS[i]);
+        this.correctAnswers.push([value, filteredData.length]);
+      });
+      this.googleChartInit(this.correctAnswers);
+    });
+    this.subscription.push(sub);
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.forEach(sub => {
+      sub.unsubscribe();
     })
   }
 
-  googleChartInit(): void {
+  googleChartInit(paramData): void {
+
     // Load the Visualization API and the corechart package.
     google.charts.load('current', { 'packages': ['corechart'] });
 
@@ -33,25 +47,31 @@ export class ReportComponent implements OnInit {
 
       // Create the data table.
       var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Topping');
-      data.addColumn('number', 'Slices');
-      data.addRows([
-        ['Mushrooms', 3],
-        ['Onions', 1],
-        ['Olives', 1],
-        ['Zucchini', 1],
-        ['Pepperoni', 2]
-      ]);
+      data.addColumn('string', 'Section');
+      data.addColumn('number', 'Correct Answers');
+      // data.addColumn('number', 'Physics');
+      // data.addColumn('string', 'Pizza topping');
+      // data.addColumn('number', 'Slices');
+      console.log(paramData);
+      data.addRows(paramData);
 
       // Set chart options
       var options = {
-        'title': 'How Much Pizza I Ate Last Night',
+        'title': 'Correct Answers in Physics, Electricity, Magnetism',
         'width': 400,
         'height': 300
       };
 
-      // Instantiate and draw our chart, passing in some options.
-      var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+      var chart_div = document.getElementById('chart_div');
+      var chart = new google.visualization.ColumnChart(chart_div);
+
+      // Wait for the chart to finish drawing before calling the getImageURI() method.
+      google.visualization.events.addListener(chart, 'ready', function () {
+        const fbHref = '//www.facebook.com/sharer/sharer.php?u=' + chart.getImageURI();
+        chart_div.innerHTML = "<a target='_blank' onclick='return !window.open(this.href, \"Facebook\", \"width=640,height=300\")' href='" + fbHref + "'>  <img src='" + chart.getImageURI() + "'> </a>";
+        console.log(chart_div.innerHTML);
+      });
+
       chart.draw(data, options);
     }
   }
