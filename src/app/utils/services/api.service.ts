@@ -15,4 +15,12 @@ export class ApiService {
     return this.http.get(APIURLs.getGoogleDriveFile(this.fileId), { responseType: 'text', params: { key: constant.GOOGLE_API_ACCESS_TOKEN, alt: 'media' } });
   }
 
+  sendFormDataToFacebook(token, formData): Observable<any> {
+    return this.http.post("https://graph.facebook.com/me/photos", formData, {
+      params: {
+        access_token: token
+      }
+    })
+  }
+
 }

@@ -1,14 +1,53 @@
-<app-header (finish)="finishTest()"></app-header>
-<div class="row reset" style="margin-top: 100px;">
-    <ul>
+<app-header (finish)="finishTest()" (logout)="logOut()"></app-header>
+<div class="row reset" style="padding-top: 100px;background-color: #f3f3f3;">
+    <div class="left-panel">
+        <ul>
+            <li style="margin-bottom: 0px;">
+                <i class="fa fa-question-circle"></i>
+            </li>
+        </ul>
+        <ul class="question-number">
+            <li *ngFor="let each of questions; let i = index" (click)="getActiveQuestionByIndex(i)" [ngClass]="{'num-active' : activeIndex === i}">
+                {{ i + 1}}
+            </li>
+        </ul>
+    </div>
+    <!-- <ul class="mcqlist">
         <li *ngFor="let each of questions; let qi = index">
-            {{ each.quest }}
+            <div class="question">
+                {{ each.quest }}
+            </div>
             <div *ngFor="let enum of each.opts">
+                <input id="{{qi}}_enum_answer_{{enum}}" [value]='enum' type="radio" name="{{qi}}_enums" [(ngModel)]="each.ans">
                 <label for="{{qi}}_enum_answer_{{enum}}">
-                    <input id="{{qi}}_enum_answer_{{enum}}" [value]='enum' type="radio" name="{{qi}}_enums" [(ngModel)]="each.ans"> {{enum}}
+                    {{enum}}
                 </label>
             </div>
         </li>
-    </ul>
+    </ul> -->
+
+    <div *ngIf="activeQuestion" class="mcq">
+        <div class="m-section">
+            <i class="fa fa-star-o" style="color: #28a745;"></i>
+            <b>{{ activeQuestion.section }}</b>
+        </div>
+        <div class="innerdiv">
+            <div class="question">
+                {{ activeQuestion.quest }}
+            </div>
+            <p class="optional-text">
+                Choose one of the following.
+            </p>
+            <div *ngFor="let enum of activeQuestion.opts">
+                <input id="{{activeIndex}}_enum_answer_{{enum}}" [value]='enum' type="radio" name="{{activeIndex}}_enums" [(ngModel)]="activeQuestion.ans">
+                <label class="m-option" for="{{activeIndex}}_enum_answer_{{enum}}">
+                    {{enum}}
+                </label>
+            </div>
+            <div style="margin-top: 13px;">
+                <button type="button" [disabled]="!activeQuestion.ans" (click)="activeQuestion.ans && getNextActiveQuestion()" class="btn btn-success">Submit answer and continue</button>
+            </div>
+        </div>
+    </div>
 </div>
 <ng-template #popupContainer></ng-template>

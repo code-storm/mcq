@@ -41,10 +41,10 @@ export class LoginComponent implements OnInit {
 
   getLoginStatus(): void {
     FB.getLoginStatus((response) => {
-      if (response.status === "authorization_expired") {
-        this.fbLogin();
-      } else if (response.status === 'connected') {
+      if (response.status === 'connected') {
         this.fbMe();
+      } else {
+        this.fbLogin();
       }
       console.log(response);
     });
@@ -53,6 +53,7 @@ export class LoginComponent implements OnInit {
   fbLogin(): void {
     FB.login(response => {
       console.log('login', response);
+      this.fbMe();
     }, { scope: 'email' });
   }
 

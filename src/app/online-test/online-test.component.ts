@@ -3,8 +3,9 @@ import { ApiService } from '../utils/services/api.service';
 import { PopupService } from '../utils/services/popup.service';
 import { DataService } from '../data.service';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Question } from './questions';
 
+declare var FB: any;
 @Component({
   selector: 'app-online-test',
   templateUrl: './online-test.component.html',
@@ -18,9 +19,12 @@ export class OnlineTestComponent implements OnInit {
     private router: Router) { }
 
   @ViewChild('popupContainer', { read: ViewContainerRef }) popupContainer;
-  questions: string[] = [];
+  questions: Question[] = [];
+  finishFlag: boolean = false;
   radioSelected: any;
   interval: any;
+  activeIndex: number = 0;
+  activeQuestion: Question;
 
   ngOnInit() {
     this.getQuestionFile();
@@ -94,7 +98,8 @@ export class OnlineTestComponent implements OnInit {
         this.finishTest();
         console.info('Ending test');
       }
-    })
+    });
+    this.activeQuestion = this.questions.find((value, i) => i === this.activeIndex);
   }
 
   finishTest(): void {
@@ -112,6 +117,28 @@ export class OnlineTestComponent implements OnInit {
 
   getReport(): void {
     this.router.navigateByUrl('generate-report');
+  }
+
+  getActiveQuestionByIndex(index): void {
+    this.activeQuestion = this.questions.find((q, i) => i === index);
+    this.activeIndex = index;
+  }
+
+  getNextActiveQuestion(): void {
+    if (this.activeIndex < this.questions.length - 1) {
+      ++this.activeIndex;
+    } else {
+      this.activeIndex = 0;
+      this.finishFlag = true;
+    }
+    this.getActiveQuestionByIndex(this.activeIndex);
+  }
+
+  logOut(): void {
+    FB.logout(() => {
+      console.log('User is logged out');
+      this.router.navigateByUrl('login');
+    })
   }
 
   private padZero = (n: number): string => {
