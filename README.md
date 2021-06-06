@@ -1,6 +1,6 @@
 # Mcq
 
-MCQ environment `https://code-storm.github.io/mcq`
+MCQ environment [Click here.](https://code-storm.github.io/mcq)
 
 ## Development server
 
