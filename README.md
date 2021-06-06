@@ -1,6 +1,6 @@
 # Mcq
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.3.
+MCQ environment `https://code-storm.github.io/mcq`
 
 ## Development server
 
